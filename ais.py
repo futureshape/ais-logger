@@ -1,4 +1,5 @@
 from pyais.stream import UDPReceiver
+from pyais.exceptions import AISBaseException
 from sqlalchemy import create_engine, Column, Integer, DateTime, Boolean, SmallInteger, String
 from sqlalchemy.orm import sessionmaker, declarative_base
 import datetime
@@ -27,7 +28,12 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for msg in UDPReceiver('192.168.1.89', 4444):
-    decoded_message = msg.decode()
+    try:
+        decoded_message = msg.decode()
+    except AISBaseException as e:
+        print(e)
+        continue
+    
     ais_content = decoded_message
     if ais_content.msg_type == 6:
         print(ais_content)
